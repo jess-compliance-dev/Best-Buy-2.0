@@ -1,5 +1,5 @@
 import pytest
-from products import Product, NonStockedProduct, LimitedProduct
+from products import Product, NonStockedProduct, LimitedProduct, PercentDiscount, Buy2Get1Free, SecondHalfPrice
 
 # my products in the shop
 product_list = [
@@ -12,6 +12,17 @@ product_list = [
     NonStockedProduct("Windows License", 125),
     LimitedProduct("Shipping", 10, 250, 1)
 ]
+
+
+# creating promotions
+second_half_price = SecondHalfPrice()
+buy2_get1_free = Buy2Get1Free()
+thirty_percent = PercentDiscount(30)
+
+# apply promotions on specific articles
+product_list[0].set_promotion(second_half_price)
+product_list[4].set_promotion(buy2_get1_free)
+product_list[7].set_promotion(thirty_percent)
 
 # normal case
 def test_create_normal_product():
@@ -66,9 +77,30 @@ def test_buy_non_stocked_product():
 def test_buy_limited_product():
     shipping = product_list[7]  # Shipping
     total_price = shipping.buy(1)
-    assert total_price == 10
+    assert total_price == 7
     assert shipping.get_quantity() == 249  # 250 - 1
     assert shipping.is_active() == True
     # Buying more than maximum per order should fail
     with pytest.raises(Exception):
         shipping.buy(2)
+
+# test 19% discount
+def test_percent_discount_single_item():
+    """19% discount"""
+    product = Product("Discounted MacBook", 1450, 10)
+    discount = PercentDiscount(19)
+    product.set_promotion(discount)
+    total = product.buy(1)
+    assert total == 1450 * 0.81
+    assert product.get_quantity() == 9
+
+# test Buy2Get 1 free
+def test_buy2_get1_free_existing_product():
+    """Buy 2, get 1 free"""
+    product = product_list[5]
+    promo = Buy2Get1Free()
+    product.set_promotion(promo)
+
+    total = product.buy(6)
+    assert total == 396
+    assert product.get_quantity() == 144
