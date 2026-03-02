@@ -98,6 +98,8 @@ def main():
         Product("Xiaomi Ultra 15 Pro", 946, 50),
         Product("Samsung ww80t604alxas2 washing machine", 548, 30),
         Product("WMF Lono Milk Frother Milk & Choc", 99, 150),
+        Product("Windows License", 125),
+        Product("Shipping", 10, 250, 1)
     ]
 
     best_buy = Store(product_list)

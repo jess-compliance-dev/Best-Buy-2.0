@@ -80,3 +80,36 @@ class Product:
 
         return total_price
 
+
+class NonStockedProduct(Product):
+    """Non-stock products, eg. licenes, non-physical products"""
+
+    def __init__(self, name, price):
+        super().__init__(name, price, quantity=0)
+
+    def get_quantity(self):
+        return 0
+
+    def buy(self, quantity) -> float:
+        if quantity <= 0:
+            raise ValueError("Quantity must be greater than 0")
+        return self.price * quantity
+
+    def show(self):
+        print(f"Product: {self.name}, Price: {self.price} (Non-stocked, digital)")
+
+
+class LimitedProduct(Product):
+    """Product with maximum amount per order"""
+
+    def __init__(self, name, price, quantity, max_per_order):
+        super().__init__(name, price, quantity)
+        self.max_per_order = max_per_order
+
+    def buy(self, quantity) -> float:
+        if quantity > self.max_per_order:
+            raise Exception(f"Maximum amount: {self.max_per_order}")
+        return super().buy(quantity)
+
+    def show(self):
+        print(f"Product: {self.name}, Price: {self.price}, Max per order: {self.max_per_order}, Quantity: {self.quantity}")
