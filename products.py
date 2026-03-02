@@ -82,10 +82,11 @@ class Product:
 
 
 class NonStockedProduct(Product):
-    """Non-stock products, eg. licenes, non-physical products"""
+    """Non-stock products, eg. licence, non-physical products"""
 
     def __init__(self, name, price):
         super().__init__(name, price, quantity=0)
+        self.active = True # stays active
 
     def get_quantity(self):
         return 0
@@ -93,7 +94,7 @@ class NonStockedProduct(Product):
     def buy(self, quantity) -> float:
         if quantity <= 0:
             raise ValueError("Quantity must be greater than 0")
-        return self.price * quantity
+        return self.price * quantity # method doesn't touch quantity reduction
 
     def show(self):
         print(f"Product: {self.name}, Price: {self.price} (Non-stocked, digital)")
@@ -102,12 +103,12 @@ class NonStockedProduct(Product):
 class LimitedProduct(Product):
     """Product with maximum amount per order"""
 
-    def __init__(self, name, price, quantity, max_per_order):
+    def __init__(self, name, price, quantity, max_per_order=0):
         super().__init__(name, price, quantity)
         self.max_per_order = max_per_order
 
     def buy(self, quantity) -> float:
-        if quantity > self.max_per_order:
+        if self.max_per_order > 0 and quantity > self.max_per_order:
             raise Exception(f"Maximum amount: {self.max_per_order}")
         return super().buy(quantity)
 

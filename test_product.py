@@ -1,5 +1,5 @@
 import pytest
-from products import Product
+from products import Product, NonStockedProduct, LimitedProduct
 
 # my products in the shop
 product_list = [
@@ -9,6 +9,8 @@ product_list = [
     Product("Xiaomi Ultra 15 Pro", 946, 50),
     Product("Samsung ww80t604alxas2 washing machine", 548, 30),
     Product("WMF Lono Milk Frother Milk & Choc", 99, 150),
+    NonStockedProduct("Windows License", 125),
+    LimitedProduct("Shipping", 10, 250, 1)
 ]
 
 # normal case
@@ -38,7 +40,6 @@ def test_product_becomes_inactive_when_quantity_zero():
     assert product.get_quantity() == 0
     assert product.is_active() == False
 
-
 # Amount > Availability of the product
 def test_buy_more_than_available_raises_exception():
     product = Product("Headphones", 150, 3)
@@ -52,3 +53,22 @@ def test_buy_product_updates_quantity_and_returns_total():
     assert total_price == 12870 # 130 * 99
     assert product.get_quantity() == 20  # 150 - 130
     assert product.is_active() == True
+
+# digital product
+def test_buy_non_stocked_product():
+    license_product = product_list[6]  # Windows License
+    total_price = license_product.buy(3)
+    assert total_price == 125 * 3
+    assert license_product.get_quantity() == 0
+    assert license_product.is_active() == True  # stays active
+
+# buy limited amounts
+def test_buy_limited_product():
+    shipping = product_list[7]  # Shipping
+    total_price = shipping.buy(1)
+    assert total_price == 10
+    assert shipping.get_quantity() == 249  # 250 - 1
+    assert shipping.is_active() == True
+    # Buying more than maximum per order should fail
+    with pytest.raises(Exception):
+        shipping.buy(2)
